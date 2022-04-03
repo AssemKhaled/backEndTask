@@ -1,4 +1,4 @@
-package com.example.backEndTask.vehicle;
+package com.example.backEndTask.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,10 @@ public class VehicleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
+
+    @Column(name = "name")
     private String name;
-    @Column(nullable = false,unique = true)
+
+    @Column(name = "serial_num",nullable = false,unique = true)
     private String serialNum;
 }

@@ -1,4 +1,4 @@
-package com.example.backEndTask.driver;
+package com.example.backEndTask.entities;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,10 @@ public class DriverEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false,unique = true)
-    private Integer mobNum ;
+
+    @Column(name = "mobile_number",nullable = false,unique = true)
+    private String  mobile_Number ;
+
+    @Column(name = "password")
     private String password;
 }

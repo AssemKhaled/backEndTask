@@ -1,9 +1,6 @@
-package com.example.backEndTask.company;
+package com.example.backEndTask.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,13 +10,23 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CompanyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "user_name")
     private String userName;
-    @Column(nullable = false,unique = true)
+
+    @Column(name = "email" , nullable = false,unique = true)
     private String email;
+
+    @Column(name = "password")
     private String password;
-    private Integer mobNum;
+
+    @Column(name = "mobile_number")
+    private String mobileNumber;
+
+
 }
