@@ -1,5 +1,4 @@
-package com.example.backEndTask.user;
-
+package com.example.backEndTask.driver;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,18 +7,16 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "driver")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserEntity {
+public class DriverEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String userName;
     @Column(nullable = false,unique = true)
-    private String email;
+    private Integer mobNum ;
     private String password;
-    private Integer mobNum;
 }
