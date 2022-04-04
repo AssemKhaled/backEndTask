@@ -1,5 +1,6 @@
 package com.example.backEndTask.dto.requests;
 
+
 import lombok.*;
 
 @AllArgsConstructor
@@ -7,7 +8,8 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class CreateVehicleRequest {
-    private String name;
-    private String serialNum;
+public class DriverLoginRequest {
+
+    private String password;
+    private String phoneNumber;
 }

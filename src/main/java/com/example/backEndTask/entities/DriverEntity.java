@@ -1,5 +1,8 @@
 package com.example.backEndTask.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 
@@ -23,4 +26,7 @@ public class DriverEntity {
 
     @Column(name = "name")
     private String name;
+
+    @JsonIgnore
+    private String token;
 }
