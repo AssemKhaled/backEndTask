@@ -1,8 +1,5 @@
 package com.example.backEndTask.entities;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,14 +9,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class DriverEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "mobile_number",nullable = false,unique = true)
-    private String  mobile_Number ;
+    @Column(name = "phone_Number",nullable = false,unique = true)
+    private String  phoneNumber ;
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "name")
+    private String name;
 }

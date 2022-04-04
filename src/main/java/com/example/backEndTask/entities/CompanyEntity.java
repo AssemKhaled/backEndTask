@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "company")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -25,8 +25,8 @@ public class CompanyEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "mobile_number")
-    private String mobileNumber;
+    @Column(name = "phone_Number")
+    private String phoneNumber;
 
 
 }

@@ -7,7 +7,6 @@ import com.example.backEndTask.dto.response.CompanyLoginResponse;
 import com.example.backEndTask.entities.CompanyEntity;
 import com.example.backEndTask.repositories.CompanyRepository;
 import com.example.backEndTask.services.CompanyService;
-import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -67,7 +66,7 @@ public class CompanyServiceImpl  implements CompanyService {
             companyRepository.save(CompanyEntity
                     .builder()
                             .email(companyRegistrationRequest.getEmail())
-                            .mobileNumber(companyRegistrationRequest.getPhoneNumber())
+                            .phoneNumber(companyRegistrationRequest.getPhoneNumber())
                             .password(hashMd5(companyRegistrationRequest.getPassword()))
                             .userName(companyRegistrationRequest.getUserName())
                     .build());
