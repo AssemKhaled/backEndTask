@@ -1,17 +1,14 @@
 package com.example.backEndTask.controllers;
 
 import com.example.backEndTask.dto.requests.AddDriverRequest;
-import com.example.backEndTask.dto.requests.CreateVehicleRequest;
+import com.example.backEndTask.dto.requests.DriverAssignToCompanyRequest;
+import com.example.backEndTask.dto.requests.DriverLiveDataRequest;
 import com.example.backEndTask.dto.requests.DriverLoginRequest;
 import com.example.backEndTask.dto.response.ApiResponse;
 import com.example.backEndTask.services.Impl.DriverServiceImpl;
-import com.example.backEndTask.services.Impl.VehicleSerivceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -28,5 +25,13 @@ public class DriverController {
     @PostMapping("/login")
     ResponseEntity<ApiResponse<Object>> driverLogin(@RequestBody DriverLoginRequest driverLoginRequest) throws NoSuchAlgorithmException {
         return driverServiceimpl.driverLogin(driverLoginRequest);
+    }
+    @PostMapping("/saveLiveData")
+    ResponseEntity<ApiResponse<Object>> saveLiveData(@RequestHeader String token, @RequestBody DriverLiveDataRequest driverLiveDataRequest)  {
+      return driverServiceimpl.saveLiveData(token,driverLiveDataRequest);
+   }
+    @PostMapping("/assignDriverToCompany")
+    ResponseEntity<ApiResponse<Object>> assignDriverToCompany(@RequestBody DriverAssignToCompanyRequest driverAssignToCompanyRequest)  {
+        return driverServiceimpl.assignDriverToCompany(driverAssignToCompanyRequest);
     }
 }

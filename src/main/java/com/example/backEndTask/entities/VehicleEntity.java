@@ -21,4 +21,10 @@ public class VehicleEntity {
 
     @Column(name = "serial_num",nullable = false,unique = true)
     private String serialNum;
+
+    @ManyToOne
+    @JoinColumn(name="company_id")
+    private CompanyEntity company;
+
+
 }

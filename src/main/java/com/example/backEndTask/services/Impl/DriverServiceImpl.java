@@ -1,16 +1,17 @@
 package com.example.backEndTask.services.Impl;
 
 import com.example.backEndTask.dto.requests.AddDriverRequest;
-import com.example.backEndTask.dto.requests.CreateVehicleRequest;
+import com.example.backEndTask.dto.requests.DriverAssignToCompanyRequest;
+import com.example.backEndTask.dto.requests.DriverLiveDataRequest;
 import com.example.backEndTask.dto.requests.DriverLoginRequest;
 import com.example.backEndTask.dto.response.ApiResponse;
-import com.example.backEndTask.dto.response.CompanyLoginResponse;
 import com.example.backEndTask.dto.response.DriverLoginResponse;
 import com.example.backEndTask.entities.CompanyEntity;
 import com.example.backEndTask.entities.DriverEntity;
-import com.example.backEndTask.entities.VehicleEntity;
+import com.example.backEndTask.entities.DriverLiveData;
+import com.example.backEndTask.repositories.CompanyRepository;
+import com.example.backEndTask.repositories.DriverLiveDataRepository;
 import com.example.backEndTask.repositories.DriverRepository;
-import com.example.backEndTask.repositories.VehicleRepository;
 import com.example.backEndTask.services.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +28,11 @@ import java.util.UUID;
 public class DriverServiceImpl implements DriverService {
     @Autowired
     private DriverRepository driverRepository;
-    private String token = UUID.randomUUID().toString();
+    @Autowired
+    private DriverLiveDataRepository driverLiveDataRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
+
 
     @Override
     public ResponseEntity<ApiResponse<Object>> addDriver(AddDriverRequest addDriverRequest) throws NoSuchAlgorithmException {
@@ -113,7 +119,7 @@ public class DriverServiceImpl implements DriverService {
             } else {
                 DriverEntity driverEntity = optionalDriverEntity.get();
                 String hashedPassword = hashMd5(driverLoginRequest.getPassword());
-
+                String token = UUID.randomUUID().toString();
 
                 if (hashedPassword.equals(driverEntity.getPassword())) {
                     ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
@@ -127,10 +133,9 @@ public class DriverServiceImpl implements DriverService {
                                     .success(true)
                                     .build());
 
-                    driverRepository.save(DriverEntity
-                            .builder()
-                            .token(token)
-                            .build());
+                    driverEntity.setToken(token);
+                    driverRepository.save(driverEntity);
+
                     return success;
                 } else {
                     ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
@@ -142,6 +147,126 @@ public class DriverServiceImpl implements DriverService {
                                     .build());
                     return failure;
                 }
+            }
+        }
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<Object>> saveLiveData(String token, DriverLiveDataRequest driverLiveDataRequest) {
+        if (driverLiveDataRequest.getLatitude() == null || driverLiveDataRequest.getLatitude().equals("")) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("failure")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure;
+        } else if (driverLiveDataRequest.getLongitude() == null || driverLiveDataRequest.getLongitude().equals("")) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("failure")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure;
+        } else if (driverLiveDataRequest.getOnTrip() == null || driverLiveDataRequest.getOnTrip().equals("")) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("failure")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure;
+        }
+        else{
+            Optional<DriverEntity> optionalDriverEntity = driverRepository.findByToken(token);
+            if (optionalDriverEntity.isPresent()) {
+
+                DriverEntity driverEntity = optionalDriverEntity.get();
+                driverLiveDataRepository.save(DriverLiveData
+                        .builder()
+                        .latitude(driverLiveDataRequest.getLatitude())
+                        .longitude(driverLiveDataRequest.getLongitude())
+                        .onTrip(driverLiveDataRequest.getOnTrip())
+                        .driverId(driverEntity.getId())
+                        .build());
+
+                ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
+                        ApiResponse
+                                .builder()
+                                .body("Success")
+                                .statusCode(200)
+                                .success(true)
+                                .build());
+                return success;
+            }else {
+                ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                        ApiResponse
+                                .builder()
+                                .body("No Such Token Found")
+                                .statusCode(401)
+                                .success(false)
+                                .build());
+                return failure;
+            }
+        }
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<Object>> assignDriverToCompany(DriverAssignToCompanyRequest driverAssignToCompanyRequest) {
+        if (driverAssignToCompanyRequest.getCompanyId() == null || driverAssignToCompanyRequest.getCompanyId().equals("")) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("failure")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure;
+        } else if (driverAssignToCompanyRequest.getDriverId() == null || driverAssignToCompanyRequest.getDriverId().equals("")) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("failure")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure;
+        }else {
+            Optional<CompanyEntity> optionalCompanyEntity = companyRepository.findById(driverAssignToCompanyRequest.getCompanyId());
+            if (optionalCompanyEntity.isPresent()) {
+                CompanyEntity companyEntity = optionalCompanyEntity.get();
+                List<DriverEntity> drivers = companyEntity.getDrivers();
+                for (Long driverId : driverAssignToCompanyRequest.getDriverId()) {
+                    Optional<DriverEntity> driverEntity = driverRepository.findById(driverId);
+                    if (driverEntity.isPresent()) {
+                        drivers.add(driverEntity.get());
+                    }
+                }
+
+                companyEntity.setDrivers(drivers);
+                companyRepository.save(companyEntity);
+
+                ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
+                        ApiResponse
+                                .builder()
+                                .body("Success")
+                                .statusCode(200)
+                                .success(true)
+                                .build());
+                return success;
+            } else {
+                ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                        ApiResponse
+                                .builder()
+                                .body("No Such Id")
+                                .statusCode(401)
+                                .success(false)
+                                .build());
+                return failure;
             }
         }
     }

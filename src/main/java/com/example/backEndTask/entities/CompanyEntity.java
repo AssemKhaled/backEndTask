@@ -3,6 +3,7 @@ package com.example.backEndTask.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "company")
@@ -28,5 +29,10 @@ public class CompanyEntity {
     @Column(name = "phone_Number")
     private String phoneNumber;
 
+    @OneToMany(mappedBy = "company")
+    private List<DriverEntity> drivers;
+
+    @OneToMany(mappedBy = "company")
+    private List<VehicleEntity> vehicles;
 
 }

@@ -29,4 +29,13 @@ public class DriverEntity {
 
     @JsonIgnore
     private String token;
+
+    @ManyToOne
+    @JoinColumn(name="company_id")
+    private CompanyEntity company;
+
+    @OneToOne
+    @JoinColumn(name = "vehicle_id")
+    private VehicleEntity vehicle   ;
+
 }

@@ -1,20 +1,18 @@
 package com.example.backEndTask.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.*;
 
-@Entity
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
-@Document("driver_live_data")
+@Builder
+@Document(collection ="driver_live_data" )
 public class DriverLiveData {
     @Id
     @Field(name = "id")
@@ -28,7 +26,7 @@ public class DriverLiveData {
     private Double longitude;
 
     @Field(name = "driver_id")
-    private Double driverId;
+    private Long driverId;
 
     @Field(name = "on_trip")
     private Boolean onTrip;
