@@ -30,6 +30,7 @@ public class CompanyEntity {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "company")
+    @Column(name = "drivers")
     private List<DriverEntity> drivers;
 
     @OneToMany(mappedBy = "company")

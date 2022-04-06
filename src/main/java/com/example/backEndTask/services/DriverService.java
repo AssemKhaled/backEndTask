@@ -9,8 +9,12 @@ import java.security.NoSuchAlgorithmException;
 public interface DriverService {
 
     ResponseEntity<ApiResponse<Object>> addDriver(AddDriverRequest addDriverRequest) throws NoSuchAlgorithmException;
-    ResponseEntity<ApiResponse<Object>> driverLogin(DriverLoginRequest driverLoginRequest) throws NoSuchAlgorithmException;
-    ResponseEntity<ApiResponse<Object>> saveLiveData(String token, DriverLiveDataRequest driverLiveDataRequest) ;
-    ResponseEntity<ApiResponse<Object>> assignDriverToCompany(DriverAssignToCompanyRequest driverAssignToCompanyRequest) ;
 
+    ResponseEntity<ApiResponse<Object>> driverLogin(DriverLoginRequest driverLoginRequest) throws NoSuchAlgorithmException;
+
+    ResponseEntity<ApiResponse<Object>> saveLiveData(String token, DriverLiveDataRequest driverLiveDataRequest);
+
+    ResponseEntity<ApiResponse<Object>> assignDriverToCompany(DriverAssignToCompanyRequest driverAssignToCompanyRequest);
+
+    ResponseEntity<ApiResponse<Object>> analysis(Long userId, Boolean onTrip);
 }

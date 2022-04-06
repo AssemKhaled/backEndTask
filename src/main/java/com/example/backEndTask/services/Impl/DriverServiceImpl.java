@@ -6,6 +6,8 @@ import com.example.backEndTask.dto.requests.DriverLiveDataRequest;
 import com.example.backEndTask.dto.requests.DriverLoginRequest;
 import com.example.backEndTask.dto.response.ApiResponse;
 import com.example.backEndTask.dto.response.DriverLoginResponse;
+import com.example.backEndTask.dto.response.IdleResponse;
+import com.example.backEndTask.dto.response.OnTripResponse;
 import com.example.backEndTask.entities.CompanyEntity;
 import com.example.backEndTask.entities.DriverEntity;
 import com.example.backEndTask.entities.DriverLiveData;
@@ -20,9 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class DriverServiceImpl implements DriverService {
@@ -239,17 +239,13 @@ public class DriverServiceImpl implements DriverService {
             Optional<CompanyEntity> optionalCompanyEntity = companyRepository.findById(driverAssignToCompanyRequest.getCompanyId());
             if (optionalCompanyEntity.isPresent()) {
                 CompanyEntity companyEntity = optionalCompanyEntity.get();
-                List<DriverEntity> drivers = companyEntity.getDrivers();
                 for (Long driverId : driverAssignToCompanyRequest.getDriverId()) {
                     Optional<DriverEntity> driverEntity = driverRepository.findById(driverId);
                     if (driverEntity.isPresent()) {
-                        drivers.add(driverEntity.get());
+                        driverEntity.get().setCompany(companyEntity);
+                        driverRepository.save(driverEntity.get());
                     }
                 }
-
-                companyEntity.setDrivers(drivers);
-                companyRepository.save(companyEntity);
-
                 ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
                         ApiResponse
                                 .builder()
@@ -270,6 +266,43 @@ public class DriverServiceImpl implements DriverService {
             }
         }
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<Object>> analysis(Long userId,Boolean onTrip) {
+        Optional<CompanyEntity> optionalCompanyEntity = companyRepository.findById(userId);
+        if(optionalCompanyEntity.isPresent()){
+            long numberOfTrips = 0 ;
+            CompanyEntity companyEntity = optionalCompanyEntity.get();
+            for (DriverEntity driverEntity : companyEntity.getDrivers()){
+                numberOfTrips += driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip,driverEntity.getId());
+            }
+            Object response ;
+            if(onTrip == true){
+                response = OnTripResponse.builder().onTrips(numberOfTrips).build();
+            }else {
+                response = IdleResponse.builder().idle(numberOfTrips).build();
+            }
+            ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
+                    ApiResponse
+                            .builder()
+                            .body(response)
+                            .statusCode(200)
+                            .success(true)
+                            .build());
+            return success;
+        }
+        else {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("No Such Id")
+                            .statusCode(401)
+                            .success(false)
+                            .build());
+            return failure;
+            }
+    }
+
 
     private String hashMd5(String password) throws NoSuchAlgorithmException     {
         MessageDigest md = MessageDigest.getInstance("MD5");

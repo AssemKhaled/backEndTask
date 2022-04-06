@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DriverLiveDataRepository extends MongoRepository<DriverLiveData,Long> {
-    long countAllByOnTrip(Boolean onTrip);
+    long countAllByOnTripAndDriverId(Boolean onTrip,Long driverId);
 
 }
