@@ -10,7 +10,7 @@ import com.example.backEndTask.dto.response.IdleResponse;
 import com.example.backEndTask.dto.response.OnTripResponse;
 import com.example.backEndTask.entities.CompanyEntity;
 import com.example.backEndTask.entities.DriverEntity;
-import com.example.backEndTask.entities.DriverLiveData;
+import com.example.backEndTask.entities.DriverLiveDataMongo;
 import com.example.backEndTask.repositories.CompanyRepository;
 import com.example.backEndTask.repositories.DriverLiveDataRepository;
 import com.example.backEndTask.repositories.DriverRepository;
@@ -36,6 +36,9 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public ResponseEntity<ApiResponse<Object>> addDriver(AddDriverRequest addDriverRequest) throws NoSuchAlgorithmException {
+
+        Optional<DriverEntity> optionalDriverEntity=driverRepository.findByPhoneNumber(addDriverRequest.getPhoneNumber());
+
         if (addDriverRequest.getPhoneNumber() == null || addDriverRequest.getPhoneNumber().equals("")) {
             ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                     ApiResponse
@@ -64,7 +67,16 @@ public class DriverServiceImpl implements DriverService {
                             .success(false)
                             .build());
             return failure;
-        } else {
+        } if(optionalDriverEntity.isPresent()) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("Phone Number Already Exists")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure ;
+        }else {
 
             driverRepository.save(DriverEntity
                     .builder()
@@ -111,8 +123,8 @@ public class DriverServiceImpl implements DriverService {
                 ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                         ApiResponse
                                 .builder()
-                                .body("ERROR NOT FOUND")
-                                .statusCode(404)
+                                .body("Login Failed unauthorized user or password")
+                                .statusCode(401)
                                 .success(false)
                                 .build());
                 return failure;
@@ -153,6 +165,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public ResponseEntity<ApiResponse<Object>> saveLiveData(String token, DriverLiveDataRequest driverLiveDataRequest) {
+
         if (driverLiveDataRequest.getLatitude() == null || driverLiveDataRequest.getLatitude().equals("")) {
             ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                     ApiResponse
@@ -180,13 +193,34 @@ public class DriverServiceImpl implements DriverService {
                             .success(false)
                             .build());
             return failure;
-        }
-        else{
+        }else{
             Optional<DriverEntity> optionalDriverEntity = driverRepository.findByToken(token);
             if (optionalDriverEntity.isPresent()) {
 
                 DriverEntity driverEntity = optionalDriverEntity.get();
-                driverLiveDataRepository.save(DriverLiveData
+                Optional<DriverLiveDataMongo> optionalDriverLiveData = driverLiveDataRepository.findByDriverId(driverEntity.getId());
+
+                if (optionalDriverLiveData.isPresent()) {
+
+                    DriverLiveDataMongo driverLiveDataMongo = optionalDriverLiveData.get();
+
+                    driverLiveDataMongo.setLatitude(driverLiveDataRequest.getLatitude());
+                    driverLiveDataMongo.setLongitude(driverLiveDataRequest.getLongitude());
+                    driverLiveDataMongo.setOnTrip(driverLiveDataRequest.getOnTrip());
+
+                    driverLiveDataRepository.save(driverLiveDataMongo);
+
+                    ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
+                            ApiResponse
+                                    .builder()
+                                    .body("Data Updated")
+                                    .statusCode(200)
+                                    .success(true)
+                                    .build());
+                    return success;
+
+                }else{
+                driverLiveDataRepository.save(DriverLiveDataMongo
                         .builder()
                         .latitude(driverLiveDataRequest.getLatitude())
                         .longitude(driverLiveDataRequest.getLongitude())
@@ -202,6 +236,7 @@ public class DriverServiceImpl implements DriverService {
                                 .success(true)
                                 .build());
                 return success;
+            }
             }else {
                 ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                         ApiResponse
@@ -213,6 +248,7 @@ public class DriverServiceImpl implements DriverService {
                 return failure;
             }
         }
+
     }
 
     @Override
@@ -269,13 +305,19 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public ResponseEntity<ApiResponse<Object>> analysis(Long userId,Boolean onTrip) {
+
         Optional<CompanyEntity> optionalCompanyEntity = companyRepository.findById(userId);
         if(optionalCompanyEntity.isPresent()){
-            long numberOfTrips = 0 ;
+
             CompanyEntity companyEntity = optionalCompanyEntity.get();
+            long numberOfTrips = 0 ;
+
             for (DriverEntity driverEntity : companyEntity.getDrivers()){
-                numberOfTrips += driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip,driverEntity.getId());
+                    if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1) {
+                        numberOfTrips++;
+                    }
             }
+
             Object response ;
             if(onTrip == true){
                 response = OnTripResponse.builder().onTrips(numberOfTrips).build();

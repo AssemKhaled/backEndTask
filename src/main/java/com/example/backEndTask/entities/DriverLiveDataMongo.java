@@ -1,6 +1,7 @@
 package com.example.backEndTask.entities;
 
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -13,11 +14,10 @@ import javax.persistence.*;
 @Getter
 @Builder
 @Document(collection ="driver_live_data" )
-public class DriverLiveData {
+public class DriverLiveDataMongo {
+
     @Id
-    @Field(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private ObjectId _id;
 
     @Field(name = "latitude")
     private Double latitude;

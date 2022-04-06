@@ -10,4 +10,5 @@ import lombok.*;
 public class CreateVehicleRequest {
     private String name;
     private String serialNum;
+    private Long companyId;
 }

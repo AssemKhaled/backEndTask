@@ -24,6 +24,8 @@ public class CompanyServiceImpl  implements CompanyService {
     @Override
     public ResponseEntity<ApiResponse<Object>> companyRegistration(CompanyRegistrationRequest companyRegistrationRequest) throws NoSuchAlgorithmException {
 
+        Optional<CompanyEntity> optionalCompanyEntity=companyRepository.findByEmail(companyRegistrationRequest.getEmail());
+
         if(companyRegistrationRequest.getEmail()==null|| companyRegistrationRequest.getEmail().equals("")){
             ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                     ApiResponse
@@ -60,8 +62,16 @@ public class CompanyServiceImpl  implements CompanyService {
                     .success(false)
                     .build());
             return failure ;
+        }else if(optionalCompanyEntity.isPresent()) {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("Email Already Exists")
+                            .statusCode(400)
+                            .success(false)
+                            .build());
+            return failure ;
         }else {
-
 
             companyRepository.save(CompanyEntity
                     .builder()
@@ -108,8 +118,8 @@ public class CompanyServiceImpl  implements CompanyService {
                 ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                         ApiResponse
                                 .builder()
-                                .body("ERROR NOT FOUND")
-                                .statusCode(404)
+                                .body("Login Failed unauthorized user or password")
+                                .statusCode(401)
                                 .success(false)
                                 .build());
                 return failure ;
