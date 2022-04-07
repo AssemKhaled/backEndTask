@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface DriverLiveDataRepository extends MongoRepository<DriverLiveDataMongo,Long> {
 
     Optional<DriverLiveDataMongo> findByDriverId(Long driverId);
-    long countAllByOnTripAndDriverId(Boolean onTrip,Long driverId);
 
+    long countAllByOnTripAndDriverId(Boolean onTrip, Long driverId);
+
+    Optional<DriverLiveDataMongo> findTopByDriverIdOrderByTimeStampDesc( Long driverId);
 }

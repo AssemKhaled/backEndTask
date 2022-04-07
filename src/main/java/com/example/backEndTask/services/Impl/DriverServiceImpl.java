@@ -22,10 +22,12 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class DriverServiceImpl implements DriverService {
+
     @Autowired
     private DriverRepository driverRepository;
     @Autowired
@@ -195,37 +197,19 @@ public class DriverServiceImpl implements DriverService {
             return failure;
         }else{
             Optional<DriverEntity> optionalDriverEntity = driverRepository.findByToken(token);
+            LocalDateTime date = LocalDateTime.now();
+
             if (optionalDriverEntity.isPresent()) {
 
                 DriverEntity driverEntity = optionalDriverEntity.get();
-                Optional<DriverLiveDataMongo> optionalDriverLiveData = driverLiveDataRepository.findByDriverId(driverEntity.getId());
 
-                if (optionalDriverLiveData.isPresent()) {
-
-                    DriverLiveDataMongo driverLiveDataMongo = optionalDriverLiveData.get();
-
-                    driverLiveDataMongo.setLatitude(driverLiveDataRequest.getLatitude());
-                    driverLiveDataMongo.setLongitude(driverLiveDataRequest.getLongitude());
-                    driverLiveDataMongo.setOnTrip(driverLiveDataRequest.getOnTrip());
-
-                    driverLiveDataRepository.save(driverLiveDataMongo);
-
-                    ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
-                            ApiResponse
-                                    .builder()
-                                    .body("Data Updated")
-                                    .statusCode(200)
-                                    .success(true)
-                                    .build());
-                    return success;
-
-                }else{
                 driverLiveDataRepository.save(DriverLiveDataMongo
                         .builder()
                         .latitude(driverLiveDataRequest.getLatitude())
                         .longitude(driverLiveDataRequest.getLongitude())
                         .onTrip(driverLiveDataRequest.getOnTrip())
                         .driverId(driverEntity.getId())
+                        .timeStamp(date)
                         .build());
 
                 ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
@@ -236,7 +220,7 @@ public class DriverServiceImpl implements DriverService {
                                 .success(true)
                                 .build());
                 return success;
-            }
+
             }else {
                 ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
                         ApiResponse
@@ -306,23 +290,49 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public ResponseEntity<ApiResponse<Object>> analysis(Long userId,Boolean onTrip) {
 
+
         Optional<CompanyEntity> optionalCompanyEntity = companyRepository.findById(userId);
         if(optionalCompanyEntity.isPresent()){
 
             CompanyEntity companyEntity = optionalCompanyEntity.get();
             long numberOfTrips = 0 ;
-
-            for (DriverEntity driverEntity : companyEntity.getDrivers()){
+            long numberOfIdle = 0 ;
+            for (DriverEntity driverEntity : companyEntity.getDrivers()) {
+                Optional<DriverLiveDataMongo> optionalDriverLiveDataMongo = driverLiveDataRepository.findTopByDriverIdOrderByTimeStampDesc(driverEntity.getId());
+                if (optionalDriverLiveDataMongo.isPresent()) {
+                    DriverLiveDataMongo driverLiveDataMongo = optionalDriverLiveDataMongo.get();
+                    if (driverLiveDataMongo.getOnTrip() == true) {
                     if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1) {
                         numberOfTrips++;
                     }
+                    }else if (driverLiveDataMongo.getOnTrip()==false) {
+                        if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1) {
+                            numberOfIdle++;
+                        }
+
+                    }
+                }
             }
+
+//            for (DriverEntity driverEntity : companyEntity.getDrivers()){
+//                Optional<DriverLiveDataMongo> optionalDriverLiveDataMongo = driverLiveDataRepository.findFirstByOnTripAndDriverIdOrderByTimeStampDesc(onTrip,driverEntity.getId());
+//                DriverLiveDataMongo driverLiveDataMongo = optionalDriverLiveDataMongo.get();
+//                    if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1 ) {
+//                        if (optionalCompanyEntity.isPresent()) {
+//                            numberOfTrips++;
+//                        }
+//
+//                    }
+//                    else if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1 || driverLiveDataMongo.getOnTrip()==false) {
+//                        numberOfIdle++;
+//                    }
+//            }
 
             Object response ;
             if(onTrip == true){
                 response = OnTripResponse.builder().onTrips(numberOfTrips).build();
             }else {
-                response = IdleResponse.builder().idle(numberOfTrips).build();
+                response = IdleResponse.builder().idle(numberOfIdle).build();
             }
             ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
                     ApiResponse
@@ -354,4 +364,5 @@ public class DriverServiceImpl implements DriverService {
                 .printHexBinary(digest).toUpperCase();
         return myHashPassword;
     }
+
 }

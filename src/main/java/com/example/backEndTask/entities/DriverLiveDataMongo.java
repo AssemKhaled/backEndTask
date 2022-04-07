@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 
 @AllArgsConstructor
@@ -31,4 +33,6 @@ public class DriverLiveDataMongo {
     @Field(name = "on_trip")
     private Boolean onTrip;
 
+    @Field(name = "time_stamp")
+    private LocalDateTime timeStamp;
 }
