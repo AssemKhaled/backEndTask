@@ -301,11 +301,11 @@ public class DriverServiceImpl implements DriverService {
                 Optional<DriverLiveDataMongo> optionalDriverLiveDataMongo = driverLiveDataRepository.findTopByDriverIdOrderByTimeStampDesc(driverEntity.getId());
                 if (optionalDriverLiveDataMongo.isPresent()) {
                     DriverLiveDataMongo driverLiveDataMongo = optionalDriverLiveDataMongo.get();
-                    if (driverLiveDataMongo.getOnTrip() == true) {
+                    if (driverLiveDataMongo.getOnTrip()) {
                     if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1) {
                         numberOfTrips++;
                     }
-                    }else if (driverLiveDataMongo.getOnTrip()==false) {
+                    }else if (!driverLiveDataMongo.getOnTrip()) {
                         if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1) {
                             numberOfIdle++;
                         }
@@ -313,20 +313,6 @@ public class DriverServiceImpl implements DriverService {
                     }
                 }
             }
-
-//            for (DriverEntity driverEntity : companyEntity.getDrivers()){
-//                Optional<DriverLiveDataMongo> optionalDriverLiveDataMongo = driverLiveDataRepository.findFirstByOnTripAndDriverIdOrderByTimeStampDesc(onTrip,driverEntity.getId());
-//                DriverLiveDataMongo driverLiveDataMongo = optionalDriverLiveDataMongo.get();
-//                    if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1 ) {
-//                        if (optionalCompanyEntity.isPresent()) {
-//                            numberOfTrips++;
-//                        }
-//
-//                    }
-//                    else if (driverLiveDataRepository.countAllByOnTripAndDriverId(onTrip, driverEntity.getId()) >= 1 || driverLiveDataMongo.getOnTrip()==false) {
-//                        numberOfIdle++;
-//                    }
-//            }
 
             Object response ;
             if(onTrip == true){
