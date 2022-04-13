@@ -38,4 +38,5 @@ public class DriverEntity {
     @JoinColumn(name = "vehicle_id")
     private VehicleEntity vehicle   ;
 
+
 }
