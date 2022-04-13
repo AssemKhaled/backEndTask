@@ -32,6 +32,7 @@ public class DriverEntity {
 
     @ManyToOne
     @JoinColumn(name="company_id")
+    @JsonIgnore
     private CompanyEntity company;
 
     @OneToOne

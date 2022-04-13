@@ -2,21 +2,16 @@ package com.example.backEndTask.services.Impl;
 
 import com.example.backEndTask.dto.response.ApiResponse;
 import com.example.backEndTask.dto.response.DummyResponse;
-import com.example.backEndTask.dto.response.OnTripResponse;
 import com.example.backEndTask.repositories.DummyMongoRepository;
 import com.example.backEndTask.services.DummyService;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 
@@ -55,16 +50,18 @@ public class DummyServiceImpl implements DummyService {
         return success ;
     }
 
-    @Override
     public ResponseEntity<ApiResponse<Object>> restTemp(Long userId)  {
-        RestTemplate restTemplate = new RestTemplate();
 
+        RestTemplate restTemplate = new RestTemplate();
         String uri = "http://localhost:8080/analysis/numberOfOnTrip?userId="+userId;
-        Object response = restTemplate.getForObject(uri , Object.class);
+        ResponseEntity<ApiResponse> response = restTemplate.exchange(uri, HttpMethod.GET,null , ApiResponse.class);
+        Object value = response.getBody().getBody();
 
         ResponseEntity<ApiResponse<Object>> result =ResponseEntity.ok(ApiResponse
                 .builder()
-                .body(response)
+                .body(value)
+                .statusCode(200)
+                .success(true)
                 .build());
 
         return result;

@@ -11,7 +11,8 @@ import java.util.Date;
 public interface DummyService {
 
     ResponseEntity<ApiResponse<Object>> amm();
-    Object restTemp(Long userId) ;
+
+    ResponseEntity<ApiResponse<Object>> restTemp(Long userId) ;
 //    void reportCurrentTime();
 
 }

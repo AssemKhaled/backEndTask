@@ -10,4 +10,6 @@ import java.security.NoSuchAlgorithmException;
 public interface CompanyService {
     ResponseEntity<ApiResponse<Object>> companyRegistration(CompanyRegistrationRequest companyRegistrationRequest) throws NoSuchAlgorithmException;
     ResponseEntity<ApiResponse<Object>> companyLogin(CompanyLoginRequest companyLoginRequest) throws NoSuchAlgorithmException;
+
+    ResponseEntity<ApiResponse<Object>> companyLiveData(Long userId);
 }

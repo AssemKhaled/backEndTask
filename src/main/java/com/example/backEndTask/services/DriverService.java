@@ -17,4 +17,6 @@ public interface DriverService {
     ResponseEntity<ApiResponse<Object>> assignDriverToCompany(DriverAssignToCompanyRequest driverAssignToCompanyRequest);
 
     ResponseEntity<ApiResponse<Object>> analysis(Long userId, Boolean onTrip);
+
+    ResponseEntity<ApiResponse<Object>> restTempDriver(AddDriverRequest addDriverRequest);
 }
