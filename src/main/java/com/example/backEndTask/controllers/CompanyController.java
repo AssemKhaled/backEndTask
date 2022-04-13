@@ -6,10 +6,7 @@ import com.example.backEndTask.dto.response.ApiResponse;
 import com.example.backEndTask.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -28,4 +25,10 @@ public class CompanyController {
     ResponseEntity<ApiResponse<Object>> companyLogin(@RequestBody CompanyLoginRequest companyLoginRequest) throws NoSuchAlgorithmException {
         return companyServiceImpl.companyLogin(companyLoginRequest);
     }
+
+    @GetMapping("/companyLiveData")
+    ResponseEntity<ApiResponse<Object>> companyLiveData(@RequestParam Long userId){
+        return companyServiceImpl.companyLiveData(userId);
+    }
+
 }

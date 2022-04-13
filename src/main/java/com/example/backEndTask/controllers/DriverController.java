@@ -34,4 +34,8 @@ public class DriverController {
     ResponseEntity<ApiResponse<Object>> assignDriverToCompany(@RequestBody DriverAssignToCompanyRequest driverAssignToCompanyRequest)  {
         return driverServiceimpl.assignDriverToCompany(driverAssignToCompanyRequest);
     }
+    @PostMapping("/restTempDriver")
+    ResponseEntity<ApiResponse<Object>> restTempDriver(@RequestBody AddDriverRequest addDriverRequest) {
+        return driverServiceimpl.restTempDriver(addDriverRequest);
+    }
 }

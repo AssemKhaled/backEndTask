@@ -35,7 +35,7 @@ public class AnalysisController {
         return driverService.analysis(userId,false);
     }
     @GetMapping("/restTemp")
-    Object restTemp(@RequestParam Long userId) throws IOException {
+    ResponseEntity<ApiResponse<Object>> restTemp(@RequestParam Long userId) throws IOException {
         return dummyService.restTemp(userId);
     }
 

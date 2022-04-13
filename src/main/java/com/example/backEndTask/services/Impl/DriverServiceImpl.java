@@ -16,8 +16,11 @@ import com.example.backEndTask.repositories.DriverLiveDataRepository;
 import com.example.backEndTask.repositories.DriverRepository;
 import com.example.backEndTask.services.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
@@ -345,6 +348,25 @@ public class DriverServiceImpl implements DriverService {
                             .build());
             return failure;
             }
+    }
+
+
+    public ResponseEntity<ApiResponse<Object>> restTempDriver(AddDriverRequest addDriverRequest)  {
+
+        RestTemplate restTemplate = new RestTemplate();
+        String uri = "http://localhost:8080/driver/create";
+        HttpEntity<AddDriverRequest> requestHttpEntity = new HttpEntity<>(addDriverRequest);
+        ResponseEntity<ApiResponse> response = restTemplate.exchange(uri, HttpMethod.POST,requestHttpEntity , ApiResponse.class);
+        Object value = response.getBody().getBody();
+
+        ResponseEntity<ApiResponse<Object>> result =ResponseEntity.ok(ApiResponse
+                .builder()
+                .body(value)
+                .statusCode(200)
+                .success(true)
+                .build());
+
+        return result;
     }
 
 
