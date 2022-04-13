@@ -80,6 +80,12 @@ public class DriverServiceImpl implements DriverService {
             return failure ;
         }else {
 
+//            DriverEntity driverEntity= new DriverEntity(
+//              addDriverRequest.getName(),
+//                addDriverRequest.getPhoneNumber(),
+//                hashMd5(addDriverRequest.getPassword())
+//
+//            );
             driverRepository.save(DriverEntity
                     .builder()
                     .name(addDriverRequest.getName())
