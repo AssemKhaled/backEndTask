@@ -166,27 +166,70 @@ public class CompanyServiceImpl  implements CompanyService {
     public ResponseEntity<ApiResponse<Object>> companyLiveData(Long userId) {
 
         List<Object> result = new ArrayList<>();
+        Object value;
         Optional<CompanyEntity> optionalCompanyEntity = companyRepository.findById(userId);
 
-        if(optionalCompanyEntity.isPresent()) {
-
+        if (optionalCompanyEntity.isPresent()) {
 
             CompanyEntity companyEntity = optionalCompanyEntity.get();
             Optional<List<DriverEntity>> optionalDriverEntities = driverRepository.findAllByCompanyId(companyEntity.getId());
             List<DriverEntity> driverEntityRes = optionalDriverEntities.get();
-            List<Long> ids = new ArrayList<>() ;
+            List<Long> ids = new ArrayList<>();
+            List<String> names= new ArrayList<>();
 
             for (DriverEntity driverEntity : driverEntityRes) {
                 ids.add(driverEntity.getId());
             }
-            Optional<List<DriverLiveDataMongo>> optionalDriverLiveDataMongo= driverLiveDataRepository.findAllByDriverIdIn(ids);
-            if(optionalCompanyEntity.isPresent()) {
-                List<DriverLiveDataMongo> driverLiveDataMongo = optionalDriverLiveDataMongo.get();
-                for (DriverLiveDataMongo driverLiveDataMongo1 : driverLiveDataMongo) {
 
+            Optional<List<DriverLiveDataMongo>> optionalDriverLiveDataMongo = driverLiveDataRepository.findAllByDriverIdIn(ids);
+
+            if (optionalDriverLiveDataMongo.isPresent()) {
+
+                List<DriverLiveDataMongo> driverLiveDataMongo1 = optionalDriverLiveDataMongo.get();
+
+                for (DriverLiveDataMongo driverLiveDataMongo : driverLiveDataMongo1) {
+                    value = CompanyLiveDataResponse
+                            .builder()
+                            .CompanyName(companyEntity.getUserName())
+                            .driverName(driverEntityRes.stream().filter(driverEntity -> driverEntity.getId().equals(driverLiveDataMongo.getDriverId())).findFirst().get().getName())
+                            .latitude(driverLiveDataMongo.getLatitude())
+                            .longitude(driverLiveDataMongo.getLongitude())
+                            .onTrip(driverLiveDataMongo.getOnTrip())
+                            .build();
+                    result.add(value);
                 }
+
+                ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
+
+                        ApiResponse
+                                .builder()
+                                .body(result)
+                                .statusCode(200)
+                                .success(true)
+                                .build());
+                return success;
+
+            } else {
+                ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                        ApiResponse
+                                .builder()
+                                .body("No Drivers Exists")
+                                .statusCode(401)
+                                .success(false)
+                                .build());
+                return failure;
             }
-    }
+
+        } else {
+            ResponseEntity<ApiResponse<Object>> failure = ResponseEntity.badRequest().body(
+                    ApiResponse
+                            .builder()
+                            .body("No Such Id")
+                            .statusCode(401)
+                            .success(false)
+                            .build());
+            return failure;
+        }
     }
 
     private String hashMd5(String password) throws NoSuchAlgorithmException {

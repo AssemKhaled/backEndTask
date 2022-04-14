@@ -14,7 +14,7 @@ public class CompanyLiveDataResponse {
 
     private String driverName;
 
-    private Object attributes;
+    //private Object attributes;
 
     private Double latitude;
 
