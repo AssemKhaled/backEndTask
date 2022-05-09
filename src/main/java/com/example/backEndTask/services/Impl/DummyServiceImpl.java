@@ -2,6 +2,7 @@ package com.example.backEndTask.services.Impl;
 
 import com.example.backEndTask.dto.response.ApiResponse;
 import com.example.backEndTask.dto.response.DummyResponse;
+import com.example.backEndTask.handlers.ResponseHandler;
 import com.example.backEndTask.repositories.DummyMongoRepository;
 import com.example.backEndTask.services.DummyService;
 import org.slf4j.Logger;
@@ -32,9 +33,27 @@ public class DummyServiceImpl implements DummyService {
 //        log.info("The time is now {}", dateFormat.format(new Date()));
 //    }
 
+//    private final ResponseHandler responseHandler;
+
+//    public DummyServiceImpl(ResponseHandler responseHandler) {
+//        this.responseHandler = responseHandler;
+//    }
+
+
     @Override
     public ResponseEntity<ApiResponse<Object>> amm() {
 //        System.out.println(dummyMongoRepository.avg()+"hi");
+
+
+
+//        return ResponseEntity.ok(responseHandler.responseSuccess(200,
+//                DummyResponse
+//                        .builder()
+//                        .max(dummyMongoRepository.max())
+//                        .min(dummyMongoRepository.min())
+//                        .avg(dummyMongoRepository.avg())
+//                        .build()));
+//
         ResponseEntity<ApiResponse<Object>> success = ResponseEntity.ok(
                 ApiResponse
                         .builder()
